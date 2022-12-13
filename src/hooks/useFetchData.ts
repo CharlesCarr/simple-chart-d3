@@ -28,7 +28,6 @@ const useFetchData = () => {
         }
 
         const data = await response.json();
-        console.log(data);
         setData(data);
         setLoading(false);
       } catch (err: any) {
