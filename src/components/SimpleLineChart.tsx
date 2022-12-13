@@ -2,7 +2,7 @@ import { useState, useEffect, useRef } from "react";
 import * as d3 from "d3";
 // import { Cd } from "../hooks/useFetchData";
 
-const Chart = ({ data }: any) => {
+const SimpleLineChart = ({ data }: any) => {
   const {
     cd_name: name,
     _1970_population: _70_pop,
@@ -33,13 +33,17 @@ const Chart = ({ data }: any) => {
       pop: Number(_10_pop),
     },
   ]);
-  console.log(newData);
   const svgRef = useRef<SVGSVGElement | null>(null);
 
   useEffect(() => {
-    // establish values
+    drawChart();
+  }, [newData]);
+
+  const drawChart = () => {
+    // set chart height and width
     const w = 600;
     const h = 300;
+    // set min/max values for axes
     const yMax = d3.max(newData, (d: any) => d.pop);
     const yMin = d3.min(newData, (d: any) => d.pop);
     const xMax = d3.max(newData, (d: any) => d.yr);
@@ -55,13 +59,10 @@ const Chart = ({ data }: any) => {
       .style("overflow", "visible");
 
     // setting the scaling (range of values for chart)
-    const xScale = d3
-      .scaleLinear()
-      .domain([xMin, xMax])
-      .range([0, w]);
+    const xScale = d3.scaleLinear().domain([xMin, xMax]).range([0, w]);
     const yScale: any = d3
       .scaleLinear()
-      .domain([yMin - 10000, yMax])
+      .domain([yMin - 10000, yMax + 5000])
       .range([h, 0]);
     const generateScaledLine = d3
       .line()
@@ -80,6 +81,14 @@ const Chart = ({ data }: any) => {
     svg.append("g").call(xAxis).attr("transform", `translate(0, ${h})`);
     svg.append("g").call(yAxis);
 
+    // setup tooltip
+    const tooltip = d3
+      .select("#container")
+      .append("div")
+      .style("visibility", "hidden")
+      .style("position", "absolute")
+      .style("background-color", "white");
+
     // setting up data for svg
     svg
       .selectAll(".line")
@@ -87,16 +96,22 @@ const Chart = ({ data }: any) => {
       .join("path")
       .attr("d", (d: any) => generateScaledLine(d))
       .attr("fill", "none")
-      .attr("stroke", "black");
-  }, [newData]);
+      .attr("stroke", "black")
+      .on("mouseover", (e: any, d: any) => {
+        console.log(e, d);
+        // console.log(d.newData.yr);
+        tooltip.style("visibility", "visible").text(`${d.pop}`);
+      });
+  };
 
   return (
-    <div>
+    <>
       <h2>{name}</h2>
-      {/* <p>(Insert Chart Here)</p> */}
-      <svg ref={svgRef}></svg>
-    </div>
+      <div id="container">
+        <svg ref={svgRef}></svg>
+      </div>
+    </>
   );
 };
 
-export default Chart;
+export default SimpleLineChart;

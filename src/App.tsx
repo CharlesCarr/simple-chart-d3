@@ -1,8 +1,9 @@
 import "./App.css";
-import Chart from "./components/Chart";
+import SimpleLineChart from "./components/SimpleLineChart";
 import useFetchData, { Cd } from "./hooks/useFetchData";
 
 function App() {
+  // Fetch city of NYC data
   const { data, loading, error } = useFetchData();
 
   const lowerEast =
@@ -14,7 +15,7 @@ function App() {
       {/* <h1>D3.js Practice</h1> */}
       <h1>D3 Line Chart of NYC Population (By Area)</h1>
       {!loading && error && <p>Error: Data Not Found</p>}
-      {loading ? <p>Loading...</p> : <Chart data={lowerEast} />}
+      {loading ? <p>Loading...</p> : <SimpleLineChart data={lowerEast} />}
     </div>
   );
 }
